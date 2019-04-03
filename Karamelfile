@@ -1,0 +1,13 @@
+dependencies:
+  - recipe: hopsmonitor::install
+    global:
+      - kagent::install
+  - recipe: hopsmonitor::default
+    global:
+      - kagent::default
+  - recipe: hopsmonitor::telegraf
+    global:
+      - kagent::default
+  - recipe: hopsmonitor::kapacitor
+    global:
+      - hopsmonitor::telegraf
