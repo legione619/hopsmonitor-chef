@@ -11,8 +11,4 @@ cookbook 'elastic', github: "giabbo79/elasticsearch-chef", branch: "1.2"
 cookbook 'hive2', github: "giabbo79/hive-chef", branch: "1.2"
 cookbook 'epipe', github: "giabbo79/epipe-chef", branch: "1.2"
 cookbook 'hops_airflow', github: "giabbo79/airflow-chef", branch: "1.2"
-<<<<<<< HEAD
 cookbook 'tensorflow', github: "giabbo79/tensorflow-chef", branch: "1.2"
-=======
-cookbook 'tensorflow', github: "giabbo79/tensorflow-chef", branch: "1.2"
->>>>>>> origin/1.2
