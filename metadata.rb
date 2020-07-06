@@ -4,24 +4,25 @@ name             "hopsmonitor"
 license          "AGPLv3"
 description      "Deploy monitoring infrastructure for the Hopsworks platform"
 long_description IO.read(File.join(File.dirname(__FILE__), 'README.md'))
-version          "1.2.0"
+version          "1.3.0"
 source_url       "https://github.com/logicalclocks/hopsmonitor-chef"
 
 %w{ ubuntu debian centos }.each do |os|
   supports os
 end
 
+depends 'java', '~> 7.0.0'
 depends 'conda'
-depends 'java'
-depends 'kagent'
 depends 'hops'
 depends 'ndb'
-depends 'elastic'
+depends 'kagent'
 depends 'kkafka'
+depends 'elastic'
 depends 'hive2'
-depends 'hops_airflow'
 depends 'epipe'
+depends 'hops_airflow'
 depends 'tensorflow'
+
 
 recipe "hopsmonitor::install", "Installs Influxdb/Grafana Server"
 recipe "hopsmonitor::default", "configures Influxdb/Grafana Server"
