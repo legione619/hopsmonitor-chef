@@ -1,3 +1,5 @@
+include_recipe "hopsmonitor::_security"
+
 #
 # InfluxDB installation
 #
@@ -69,6 +71,8 @@ end
 
 my_private_ip = my_private_ip()
 
+crypto_dir = x509_helper.get_crypto_dir(node['hopsmonitor']['user'])
+certificate = "#{crypto_dir}/#{x509_helper.get_certificate_bundle_name(node['hopsmonitor']['user'])}"
 template"#{node['influxdb']['conf_dir']}/influxdb.conf" do
   source "influxdb.conf.erb"
   owner node['hopsmonitor']['user']
@@ -76,7 +80,8 @@ template"#{node['influxdb']['conf_dir']}/influxdb.conf" do
   mode 0650
   variables({
      :my_ip => my_private_ip,
-     :hostnamepattern => node['fqdn'].gsub(/\w+/, "hostname")
+     :hostnamepattern => node['fqdn'].gsub(/\w+/, "hostname"),
+     :certificate => certificate
   })
 end
 
@@ -164,3 +169,11 @@ if node['kagent']['enabled'] == "true"
      log_file "/var/log/influxdb.log"
    end
 end
+
+if service_discovery_enabled()
+  # Register InfluxDb with Consul
+  consul_service "Registering InfluxDB with Consul" do
+    service_definition "influx-consul.hcl.erb"
+    action :register
+  end
+end 
