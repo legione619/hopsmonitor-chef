@@ -21,6 +21,39 @@ directory node['prometheus']['root_dir'] do
   action :create
 end
 
+directory node['prometheus']['data_volume']['root_dir'] do
+  owner node['hopsmonitor']['user']
+  group node['hopsmonitor']['group']
+  mode '0750'
+  action :create
+end
+
+directory node['prometheus']['data_volume']['data_dir'] do
+  owner node['hopsmonitor']['user']
+  group node['hopsmonitor']['group']
+  mode '0750'
+  action :create
+end
+
+bash 'Move prometheus data to data volume' do
+  user 'root'
+  code <<-EOH
+    set -e
+    mv -f #{node['prometheus']['data_dir']}/* #{node['prometheus']['data_volume']['data_dir']}
+    rm -rf #{node['prometheus']['data_dir']}
+  EOH
+  only_if { conda_helpers.is_upgrade }
+  only_if { File.directory?(node['prometheus']['data_dir'])}
+  not_if { File.symlink?(node['prometheus']['data_dir'])}
+end
+
+link node['prometheus']['data_dir'] do
+  owner node['hopsmonitor']['user']
+  group node['hopsmonitor']['group']
+  mode '0750'
+  to node['prometheus']['data_volume']['data_dir']
+end
+
 prometheus_downloaded= "#{node['prometheus']['home']}/.prometheus.extracted_#{node['prometheus']['version']}"
 # Extract prometheus 
 bash 'extract_prometheus' do
@@ -45,6 +78,8 @@ crypto_dir = x509_helper.get_crypto_dir(node['hopsmonitor']['user'])
 certificate = "#{crypto_dir}/#{x509_helper.get_certificate_bundle_name(node['hopsmonitor']['user'])}"
 key = "#{crypto_dir}/#{x509_helper.get_private_key_pkcs8_name(node['hopsmonitor']['user'])}"
 hops_ca = "#{crypto_dir}/#{x509_helper.get_hops_ca_bundle_name()}"
+#check if installation for managed cloud, aka: enterprise installation and installing the cloud recipe 
+managed_cloud = (node['install']['enterprise']['install'].casecmp? "true" and exists_local("cloud", "default"))
 template "#{node['prometheus']['base_dir']}/prometheus.yml" do
   source "prometheus.yml.erb" 
   owner node['hopsmonitor']['user']
@@ -55,7 +90,8 @@ template "#{node['prometheus']['base_dir']}/prometheus.yml" do
       'alertmanagers' => consul_helper.get_service_fqdn("alertmanager.prometheus") + ":" + node['alertmanager']['port'],
       'certificate' => certificate,
       'key' => key,
-      'hops_ca' => hops_ca
+      'hops_ca' => hops_ca,
+      'managed_cloud' => managed_cloud
   })
 end
 

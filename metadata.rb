@@ -4,7 +4,7 @@ name             "hopsmonitor"
 license          "AGPLv3"
 description      "Deploy monitoring infrastructure for the Hopsworks platform"
 long_description IO.read(File.join(File.dirname(__FILE__), 'README.md'))
-version          "2.3.0"
+version          "2.5.0"
 source_url       "https://github.com/logicalclocks/hopsmonitor-chef"
 
 %w{ ubuntu debian centos }.each do |os|
@@ -30,8 +30,16 @@ attribute "hopsmonitor/user",
           :description => "User to run Prometheus/Grafana server as",
           :type => "string"
 
+attribute "hopsmonitor/user_id",
+          :description => "Monitor user id. Default: 1503",
+          :type => "string"
+
 attribute "hopsmonitor/group",
           :description => "Group to run Prometheus/Grafana server as",
+          :type => "string"
+
+attribute "hopsmonitor/group_id",
+          :description => "Monitor group id. Default: 1503",
           :type => "string"
 
 attribute "hopsmonitor/dir",
@@ -123,4 +131,19 @@ attribute "alertmanager/email/auth_identity",
           :type => "string"
 attribute "alertmanager/email/text",
           :description => "Email text template",
+          :type => "string"
+
+#
+# Managed cloud
+#
+attribute "cloud/queue_config/capacity",
+          :description => "capacit of the queue for sending metrics to hopsworks.ai",
+          :type => "string"
+
+attribute "cloud/queue_config/max_sample_per_send",
+          :description => "maximum number of samples per metrics send to hopsworks.ai",
+          :type => "string"
+
+attribute "cloud/queue_config/batch_send_deadline",
+          :description => "maximum time before a metric is sent to hopsworks.ai",
           :type => "string"

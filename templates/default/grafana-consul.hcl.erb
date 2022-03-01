@@ -8,10 +8,9 @@ service {
     check = {
         id = "grafana-check"
         name = "Health check for Grafana"
-        tcp = "localhost:<%= node['grafana']['port'] %>"
-#        http = "http://localhost:<%= node['grafana']['port'] %>/api/healthy"
+        http = "http://localhost:<%= node['grafana']['port'] %>/api/health"
         interval = "20s"
-        timeout = "5s"
-#        status = "passing"
+        timeout = "20s"
+        status = "passing"
     }
 }
